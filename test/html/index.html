@@ -6,6 +6,7 @@
   </head>
   <body>
     <div id="mocha"></div>
+    <div id="container"></div>
     <script src="../../node_modules/mocha/mocha.js"></script>
     <script src="../../node_modules/chai/chai.js"></script>
     <script src="../../node_modules/underscore/underscore.js"></script>
@@ -19,7 +20,7 @@
       mocha.reporter('html');
       assert = chai.assert;
     </script>
-    <script src="../lib/nested_view_test.js"></script>
+    <script src="../browser.js"></script>
     <script>
       if (window.mochaPhantomJS) { mochaPhantomJS.run(); }
       else { mocha.run(); }

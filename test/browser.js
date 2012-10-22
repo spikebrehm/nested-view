@@ -35,7 +35,6 @@
       var _this = this;
       this.childViews['user_view'].on('clicked', function(e){
         _this.trigger('child_clicked', e);
-        console.log(_this, 'child_clicked');
       });
     }
   });
@@ -46,7 +45,6 @@
     events: {'click':'click'},
     click: function(e){
       this.trigger('clicked', e);
-      console.log(this, 'clicked');
     }
   });
 

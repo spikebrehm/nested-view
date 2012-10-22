@@ -1,0 +1,158 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Nested-view by spikebrehm</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Nested-view</h1>
+        <p>Declarative nested Backbone/Handlebars views.</p>
+
+        <p class="view"><a href="https://github.com/spikebrehm/nested-view">View the Project on GitHub <small>spikebrehm/nested-view</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/spikebrehm/nested-view/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/spikebrehm/nested-view/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/spikebrehm/nested-view">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>NestedView</h1>
+
+<p>Declarative nested Backbone/Handlebars views.  Render nested view hierarchies in both the browser and in Node.js.</p>
+
+<h2>Usage</h2>
+
+<p>In your Handlebars templates, use the <code>{{view}}</code> helper to declare nested child views.</p>
+
+<h3>Example</h3>
+
+<h4><code>index_view.hbs</code></h4>
+
+<pre><code>&lt;h1&gt;Hello, {{user.name}}.&lt;/h1&gt;
+{{view "user_detail_view" context=user}}
+</code></pre>
+
+<h4><code>user_detail_view.hbs</code></h4>
+
+<pre><code> &lt;li&gt;Name: {{name}}&lt;/li&gt;
+ &lt;li&gt;Email: {{email}}&lt;/li&gt;
+</code></pre>
+
+<h4><code>index_view.js</code></h4>
+
+<pre><code>var IndexView = NestedView.extend({
+  name: 'index_view'
+});
+</code></pre>
+
+<h4><code>user_detail_view.js</code></h4>
+
+<pre><code>var UserDetailView = NestedView.extend({
+  name: 'user_detail_view',
+  tagName: 'ul'
+});
+</code></pre>
+
+<h4><code>application.js</code></h4>
+
+<pre><code>var data = {user: {name: 'Spike', email: 'spike@example.info'}};
+var indexView = new IndexView(data);
+
+// On the server, grab the view hierarchy's HTML using NestedView::getHtml().
+console.log(indexView.getHtml());
+
+// In the client, just call render.
+console.log(indexView.render().el);
+</code></pre>
+
+<p>Output:</p>
+
+<pre><code>&lt;div data-view="index_view" data-cid="view1"&gt;
+  &lt;h1&gt;Hello, Spike.&lt;/h1&gt;
+  &lt;ul data-view="user_detail_view" data-cid="view2"&gt;
+    &lt;li&gt;Name: Spike&lt;/li&gt;
+    &lt;li&gt;Email: spike@example.info&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;
+</code></pre>
+
+<h3>Accessing child views</h3>
+
+<p><code>NestedView</code> helps you construct modular, DRY view components. An important element in this design is to not allow child views to know anything about the world around them, including their parent. Instead, parent views have a reference to each child view, and child views communicate with the world around them by emitting and listening to events.</p>
+
+<p>Here's an example of how to bind to an event on a child view.</p>
+
+<h4><code>user_detail_view.js</code></h4>
+
+<pre><code>var UserDetailView = NestedView.extend({
+  name: 'user_detail_view',
+  tagName: 'ul',
+  events: {
+    'click li': 'selectRow'
+  },
+  selectRow: function(e) {
+    this.trigger('row_selected', e.currentTarget);
+  }
+});
+</code></pre>
+
+<h4><code>index_view.js</code></h4>
+
+<pre><code>var IndexView = NestedView.extend({
+  name: 'index_view',
+  postRender: function(e) {
+    this.childViews['user_detail_view'].on('row_selected', function(domEl){
+      // do something
+      console.log(domEl);
+    });
+  }
+});
+</code></pre>
+
+<h2>Methods</h2>
+
+<h3><code>view.render()</code></h3>
+
+<p>Render is called only in the browser environment. The render method is implemented for you out of the box -- you should never override it. It renders the DOM based on the HTML returned by <code>view.getHtml({outerHtml: false})</code> and then initializes any child views that are present in that HTML. It calls <code>view.postRender()</code> when it's done, so you can do anything that needs access to the DOM or to child views.</p>
+
+<h3><code>view.postRender()</code></h3>
+
+<p>Called after the view and its child views are rendered to the DOM, and child view instances have been bound to child view DOM elements. This method is wehre you put any initialization code that needs access to the DOM, such as setting up slideshows, or anything that needs access to child views, such as binding to their events.</p>
+
+<h3><code>view.getHtml([options])</code></h3>
+
+<p>Returns the HTML of that view and all of its subviews. It combines the template function returned by <code>view.getTemplate()</code> and the template data returned by <code>view.getTemplateData()</code> to produce the view's HTML.</p>
+
+<h4><code>options.outerHtml ?= true</code></h4>
+
+<p>If you pass <code>{outerHtml: false}</code>, then it just returns the inner HTML. This is used by <code>view.render()</code>.</p>
+
+<h3><code>view.getTemplate()</code></h3>
+
+<p>This method returns the compiled Handlebars template that is used to render this view. The default implementation is almost surely not compatible with your particular application setup. Rather than overriding this for every view, it is useful to subclass <code>NestedView</code> for your own needs, and customize the <code>getTemplate()</code> method once.</p>
+
+<h3><code>view.getTemplateData()</code></h3>
+
+<p>Here is where you customize what data gets passed to the Handlebars template for producing HTML. This method can function as a presenter or view-model. The default implementation returns <code>this.model.toJSON()</code> if a model is present, <code>{collection: this.collection.toJSON()}</code> if a collection is present, and otherwise just returns <code>_.clone(this.options)</code>. </p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/spikebrehm">spikebrehm</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>

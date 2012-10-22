@@ -6,6 +6,10 @@
     , listingData = {name: 'Cozy downtown', user: userData}
     , cidRe = / data-cid="\w+"/g;
 
+  function stripCid(html){
+    return html.replace(cidRe, '');
+  }
+
   NestedView.registerHandlebars(Handlebars);
 
   var BaseNestedView = NestedView.extend({

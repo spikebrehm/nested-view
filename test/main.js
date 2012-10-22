@@ -6,7 +6,12 @@
     , NestedView = server ? require('../index') : this.NestedView
     , views = {}
     , templates = {}
-    , userData = {name: 'Spike', email: 'spike@email.com'};
+    , userData = {name: 'Spike', email: 'spike@email.com'}
+    , cidRe = / data-cid="\w+"/g;
+
+  function stripCid(html){
+    return html.replace(cidRe, '');
+  }
 
   NestedView.registerHandlebars(Handlebars);
 
@@ -76,14 +81,14 @@
         var innerView = new views['inner_view'](userData)
           , html = innerView.getHtml();
 
-        assert.equal(html, '<div class="inner" data-view="inner_view">Name: Spike<br>Email: spike@email.com</div>');
+        assert.equal(stripCid(html), '<div class="inner" data-view="inner_view">Name: Spike<br>Email: spike@email.com</div>');
       });
 
       it('should return the innerHtml of a single view', function(){
         var innerView = new views['inner_view'](userData)
           , html = innerView.getHtml({outerHtml: false});
 
-        assert.equal(html, 'Name: Spike<br>Email: spike@email.com');
+        assert.equal(stripCid(html), 'Name: Spike<br>Email: spike@email.com');
       });
 
       it('should return the html of a nested view', function(){
@@ -91,7 +96,7 @@
           , outerView = new views['outer_view'](data)
           , html = outerView.getHtml();
 
-        assert.equal(html,
+        assert.equal(stripCid(html),
           '<section class="outer" data-view="outer_view"><h1>Hello, Spike.</h1>' +
           '<div class="inner" data-view="inner_view">Name: Spike<br>Email: spike@email.com</div></section>'
         );

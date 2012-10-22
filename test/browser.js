@@ -3,7 +3,8 @@
     , views = {}
     , templates = {}
     , userData = {first_name: 'Spike', last_name: 'Brehm'}
-    , listingData = {name: 'Cozy downtown', user: userData};
+    , listingData = {name: 'Cozy downtown', user: userData}
+    , cidRe = / data-cid="\w+"/g;
 
   NestedView.registerHandlebars(Handlebars);
 
@@ -57,8 +58,8 @@
           , innerHtml = listingView.getHtml({outerHtml: false})
           , outerHtml = listingView.getHtml();
 
-        assert.equal(renderedInnerHtml, innerHtml);
-        assert.equal(renderedOuterHtml, outerHtml);
+        assert.equal(stripCid(renderedInnerHtml), stripCid(innerHtml));
+        assert.equal(stripCid(renderedOuterHtml), stripCid(outerHtml));
       });
     });
 

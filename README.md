@@ -1,35 +1,37 @@
 # NestedView
 
-Declarative nested Backbone/Handlebars views.  More render nested view hierarchies in both the browser and in Node.js.
+Declarative nested Backbone/Handlebars views.  Render nested view hierarchies in both the browser and in Node.js.
 
 ## Usage
 
 In your Handlebars templates, use the `{{view}}` helper to declare nested child views.
 
-### `index_view.hbs`
+### Example
+
+#### `index_view.hbs`
 
     <h1>Hello, {{user.name}}.</h1>
     {{view "user_detail_view" context=user}}
 
-### `user_detail_view.hbs`
+#### `user_detail_view.hbs`
 
      <li>Name: {{name}}</li>
      <li>Email: {{email}}</li>
 
-### `index_view.js`
+#### `index_view.js`
 
     var IndexView = NestedView.extend({
       name: 'index_view'
     });
 
-### `user_detail_view.js`
+#### `user_detail_view.js`
 
     var UserDetailView = NestedView.extend({
       name: 'user_detail_view',
       tagName: 'ul'
     });
 
-### `application.js`
+#### `application.js`
 
 	var data = {user: {name: 'Spike', email: 'spike@example.info'}};
     var indexView = new IndexView(data);
@@ -49,3 +51,61 @@ Output:
 	    <li>Email: spike@example.info</li>
 	  </ul>
     </div>
+    
+### Accessing child views
+
+`NestedView` helps you construct modular, DRY view components. An important element in this design is to not allow child views to know anything about the world around them, including their parent. Instead, parent views have a reference to each child view, and child views communicate with the world around them by emitting and listening to events.
+
+Here's an example of how to bind to an event on a child view.
+
+#### `user_detail_view.js`
+
+    var UserDetailView = NestedView.extend({
+      name: 'user_detail_view',
+      tagName: 'ul',
+      events: {
+        'click li': 'selectRow'
+      },
+      selectRow: function(e) {
+        this.trigger('row_selected', e.currentTarget);
+      }
+    });
+
+#### `index_view.js`
+
+    var IndexView = NestedView.extend({
+      name: 'index_view',
+      postRender: function(e) {
+        this.childViews['user_detail_view'].on('row_selected', function(domEl){
+          // do something
+          console.log(domEl);
+        });
+      }
+    });
+
+##  Methods
+
+### `view.render()`
+
+Render is called only in the browser environment. The render method is implemented for you out of the box -- you should never override it. It renders the DOM based on the HTML returned by `view.getHtml({outerHtml: false})` and then initializes any child views that are present in that HTML. It calls `view.postRender()` when it's done, so you can do anything that needs access to the DOM or to child views.
+
+### `view.postRender()`
+
+Called after the view and its child views are rendered to the DOM, and child view instances have been bound to child view DOM elements. This method is wehre you put any initialization code that needs access to the DOM, such as setting up slideshows, or anything that needs access to child views, such as binding to their events.
+
+### `view.getHtml([options])`
+
+Returns the HTML of that view and all of its subviews. It combines the template function returned by `view.getTemplate()` and the template data returned by `view.getTemplateData()` to produce the view's HTML.
+
+#### `options.outerHtml ?= true`
+
+If you pass `{outerHtml: false}`, then it just returns the inner HTML. This is used by `view.render()`.
+
+### `view.getTemplate()`
+
+This method returns the compiled Handlebars template that is used to render this view. The default implementation is almost surely not compatible with your particular application setup. Rather than overriding this for every view, it is useful to subclass `NestedView` for your own needs, and customize the `getTemplate()` method once.
+
+### `view.getTemplateData()`
+
+Here is where you customize what data gets passed to the Handlebars template for producing HTML. This method can function as a presenter or view-model. The default implementation returns `this.model.toJSON()` if a model is present, `{collection: this.collection.toJSON()}` if a collection is present, and otherwise just returns `_.clone(this.options)`. 
+    

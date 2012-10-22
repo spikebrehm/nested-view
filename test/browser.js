@@ -70,8 +70,9 @@
 
         listingView.on('child_clicked', function(e){
           assert(true);
-          assert.equal(e.currentTarget === listingView.childViews['user_view'].el);
+          assert.equal(e.currentTarget, listingView.childViews['user_view'].el);
           done();
+          $('#container').html('');
         });
 
         $('#container').html(listingView.render().el);

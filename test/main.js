@@ -86,7 +86,7 @@
 
       it('should return the innerHtml of a single view', function(){
         var innerView = new views['inner_view'](userData)
-          , html = innerView.getHtml({outerHtml: false});
+          , html = innerView.getInnerHtml();
 
         assert.equal(stripCid(html), 'Name: Spike<br>Email: spike@email.com');
       });

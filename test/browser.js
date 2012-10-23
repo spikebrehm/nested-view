@@ -59,7 +59,7 @@
         var listingView = new views['listing_view'](listingData)
           , renderedInnerHtml = listingView.render().$el.html()
           , renderedOuterHtml = listingView.el.outerHTML
-          , innerHtml = listingView.getHtml({outerHtml: false})
+          , innerHtml = listingView.getInnerHtml()
           , outerHtml = listingView.getHtml();
 
         assert.equal(stripCid(renderedInnerHtml), stripCid(innerHtml));

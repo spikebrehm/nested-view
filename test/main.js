@@ -107,7 +107,11 @@
       it('should provide access to child view instances', function(){
         var data = {user: userData}
           , outerView = new views['outer_view'](data)
-          , innerView = outerView.childViews['inner_view'];
+          , innerView;
+
+        outerView.getHtml();
+
+        innerView = outerView.childViews['inner_view'];
 
         assert(innerView instanceof views['inner_view']);
         assert.deepEqual(innerView.options, data.user);

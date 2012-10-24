@@ -23,7 +23,8 @@
   "dependencies": {
     "underscore": "1.4.2",
     "backbone": "0.9.2",
-    "handlebars": "1.0.7"
+    "handlebars": "1.0.7",
+    "async": "*"
   },
   "devDependencies": {
     "mocha": "*",

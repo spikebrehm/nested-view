@@ -93,13 +93,13 @@ Render is called only in the browser environment. The render method is implement
 
 Called after the view and its child views are rendered to the DOM, and child view instances have been bound to child view DOM elements. This method is wehre you put any initialization code that needs access to the DOM, such as setting up slideshows, or anything that needs access to child views, such as binding to their events.
 
-### `view.getHtml([options])`
+### `view.getHtml()`
 
-Returns the HTML of that view and all of its subviews. It combines the template function returned by `view.getTemplate()` and the template data returned by `view.getTemplateData()` to produce the view's HTML.
+Returns the outer HTML of that view, including the outer-most DOM element, and all of its subviews. This is what to call, for example, on the server to get the entire view hierarchy's HTML in one big chunk.
 
-#### `options.outerHtml ?= true`
+### `view.getInnerHtml()`
 
-If you pass `{outerHtml: false}`, then it just returns the inner HTML. This is used by `view.render()`.
+It combines the template function returned by `view.getTemplate()` and the template data returned by `view.getTemplateData()` to produce the view's HTML. This is used by `view.render()` in the client-side, because the outer DOM element already exists or is provided by `Backbone.View`. Override `view.getInnerHtml()` if you want to customize how the view's HTML is constructed, such as to build a composite view that combines subviews in a special way, such as a collection view or a set of tabs.
 
 ### `view.getTemplate()`
 

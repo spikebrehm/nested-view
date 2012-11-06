@@ -1,6 +1,6 @@
 {
   "name": "nested-view",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Declarative nested Backbone/Handlebars views.",
   "main": "index.js",
   "directories": {

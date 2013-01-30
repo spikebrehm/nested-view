@@ -38,7 +38,7 @@
     className: 'listing',
     postRender: function(){
       var _this = this;
-      this.childViews['user_view'].on('clicked', function(e){
+      this.getChildView('user_view').on('clicked', function(e){
         _this.trigger('child_clicked', e);
       });
     }
@@ -73,7 +73,7 @@
 
         listingView.on('child_clicked', function(e){
           assert(true);
-          assert.equal(e.currentTarget, listingView.childViews['user_view'].el);
+          assert.equal(e.currentTarget, listingView.getChildView('user_view').el);
           done();
           $('#container').html('');
         });

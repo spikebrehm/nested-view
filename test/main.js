@@ -7,7 +7,9 @@
     , views = {}
     , templates = {}
     , userData = {name: 'Spike', email: 'spike@email.com'}
-    , cidRe = / data-cid="\w+"/g;
+    , cidRe = / data-cid="\w+"/g
+    , Backbone = require('backbone');
+
 
   function stripCid(html){
     return html.replace(cidRe, '');
